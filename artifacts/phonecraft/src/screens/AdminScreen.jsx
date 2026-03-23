@@ -361,7 +361,7 @@ export default function AdminScreen({ user, showToast, lang }) {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(`৳${amount} ${isBn ? 'ব্যালেন্স যোগ হয়েছে' : 'balance added'}`);
+        showToast(`${formatMoney(amount)} ${t.admin_balance_added}`);
         fetchUsers();
         fetchMyQuota();
         setAddBalanceAmount('');
