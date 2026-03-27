@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import Icons from "../Icons.jsx";
 import { I18N } from "../i18n.js";
@@ -89,25 +89,25 @@ function PaymentPage({ page, onBack, onConfirm, showToast, lang, user }) {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,#0f4c3a,#1a7a5e)', padding: '16px 16px 20px', position: 'relative' }}>
-        <button onClick={onBack} style={{ background: 'rgba(255,255,255,.15)', border: 'none', borderRadius: 8, padding: '6px 10px', color: '#fff', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+      <div style={{ background: 'linear-gradient(135deg,#07152a 0%,#0d2d4f 50%,#0a3d50 100%)', padding: '16px 16px 20px', position: 'relative', borderBottom: '1px solid rgba(0,212,180,.2)' }}>
+        <button onClick={onBack} style={{ background: 'rgba(0,212,180,.15)', border: '1px solid rgba(0,212,180,.3)', borderRadius: 8, padding: '6px 10px', color: '#00d4aa', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
           ← {lang === 'bn' ? 'ফিরে যান' : 'Back'}
         </button>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,.7)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <div style={{ fontSize: 11, color: 'rgba(0,212,180,.8)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700 }}>
               {page.tab === 'deposit' ? (lang === 'bn' ? 'ডিপোজিট' : 'DEPOSIT') : (lang === 'bn' ? 'উইথড্র' : 'WITHDRAW')}
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#fff', fontFamily: 'Space Grotesk' }}>
               {amtDisplay}
             </div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,.6)', marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,.5)', marginTop: 4 }}>
               {lang === 'bn' ? 'কম বা বেশি পাঠাবেন না' : 'Send exact amount only'}
             </div>
           </div>
-          <div style={{ background: 'rgba(255,255,255,.15)', borderRadius: 10, padding: '8px 14px', textAlign: 'center' }}>
-            <div style={{ fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: 2, textTransform: 'uppercase' }}>PAY</div>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,.8)' }}>SERVICE</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <img src={`${BASE_URL}logo.png`} alt="PhoneCraft" style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'contain', background: 'rgba(0,212,180,.12)', padding: 4, border: '1px solid rgba(0,212,180,.25)' }} />
+            <span style={{ fontSize: 8, fontWeight: 800, color: 'rgba(0,212,180,.9)', letterSpacing: 1, textTransform: 'uppercase' }}>PhoneCraft</span>
           </div>
         </div>
       </div>
@@ -265,14 +265,6 @@ function WalletScreen({ user, setUser, showToast, lang, appSettings, tErr, usdRa
       .catch(() => {});
   }, []);
 
-  const fetchTransactions = useCallback(() => {
-    if (!user?.id) return;
-    authFetch(`${API_URL}/api/user/${user.id}/transactions`)
-      .then(r => r.json())
-      .then(data => { if (data.transactions) setTransactions(data.transactions); })
-      .catch(() => {});
-  }, [user?.id]);
-
   useEffect(() => {
     if (!user?.id) return;
     setTxLoading(true);
@@ -282,14 +274,6 @@ function WalletScreen({ user, setUser, showToast, lang, appSettings, tErr, usdRa
       .catch(() => {})
       .finally(() => setTxLoading(false));
   }, [user?.id]);
-
-  // Auto-refresh transactions every 15s when there are pending ones
-  useEffect(() => {
-    const hasPending = transactions.some(tx => tx.status === 'pending');
-    if (!hasPending) return;
-    const timer = setInterval(fetchTransactions, 15_000);
-    return () => clearInterval(timer);
-  }, [transactions, fetchTransactions]);
 
   useEffect(() => {
     if (!cryptoEnabled && method === 'crypto') setMethod('bkash');
